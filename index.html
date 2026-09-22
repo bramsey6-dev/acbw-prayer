@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E9EEF3">
+<title>Sunday Prayer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕯️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  /* Athens Church Beechwood | Prayer Team
+     Each month, the app looks for a tab named like "November 2026"
+     (current month and year). If it can't find one, it reads the
+     first tab. To force a specific tab, type its name in TAB_NAME. */
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/1-FkEawo2h-XRQodiBHL2tqI6WoyNCpb-NuLCB3iLowQ/edit?usp=sharing";
+  const SHEET_ID = (SHEET_URL.match(/\/d\/([a-zA-Z0-9_-]+)/)||[])[1];
+  const TAB_NAME = "";
+</script>
+<style>
+:root{
+  --sky:#E9EEF3; --card:#FFFFFF; --ink:#1F2A44; --muted:#5E6B82;
+  --line:#D5DDE7; --gold:#C8962E; --glow:rgba(226,176,74,.22);
+  --shadow:0 18px 40px -18px rgba(31,42,68,.35); --sage:#4F7A5E; --sageglow:rgba(122,154,130,.25);
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky:#141B2B; --card:#1E2740; --ink:#EEF1F6; --muted:#A3AEC4;
+    --line:#2E3956; --gold:#E2B04A; --glow:rgba(226,176,74,.16);
+    --shadow:0 18px 40px -18px rgba(0,0,0,.7); --sage:#8DB89A; --sageglow:rgba(141,184,154,.18);
+  }
+}
+:root[data-theme="dark"]{
+  --sky:#141B2B; --card:#1E2740; --ink:#EEF1F6; --muted:#A3AEC4;
+  --line:#2E3956; --gold:#E2B04A; --glow:rgba(226,176,74,.16);
+  --shadow:0 18px 40px -18px rgba(0,0,0,.7); --sage:#8DB89A; --sageglow:rgba(141,184,154,.18);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{
+  background:var(--sky); color:var(--ink); font-family:var(--sans);
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.app{flex:1; display:flex; flex-direction:column; max-width:520px; width:100%; margin:0 auto; padding:16px 20px 20px; min-height:0}
+
+header{display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:4px 2px 14px}
+.title{font-family:var(--serif); font-size:1.35rem; font-weight:500; margin:0}
+.count{font-size:.9rem; color:var(--muted); font-variant-numeric:tabular-nums}
+
+.bar{height:3px; background:var(--line); border-radius:3px; overflow:hidden; margin:0 2px 18px}
+.bar span{display:block; height:100%; width:0; background:var(--gold); transition:width .35s ease}
+
+.stack{position:relative; flex:1; min-height:0}
+.card{
+  position:absolute; inset:0; background:var(--card); border-radius:28px;
+  box-shadow:var(--shadow); padding:28px 26px 26px;
+  display:flex; flex-direction:column; touch-action:pan-y; user-select:none;
+  transition:transform .3s ease, opacity .3s ease; overflow:hidden;
+}
+.card.under{transform:scale(.95) translateY(14px); opacity:.6}
+.card.dragging{transition:none}
+.card::before{
+  content:""; position:absolute; top:-80px; right:-80px; width:220px; height:220px;
+  border-radius:50%; background:radial-gradient(circle, var(--glow), transparent 70%);
+  pointer-events:none;
+}
+.cat{
+  align-self:flex-start; font-size:.85rem; font-weight:600; color:var(--gold);
+  padding:5px 12px; border:1.5px solid currentColor; border-radius:999px; margin-bottom:22px;
+}
+.for{font-size:.95rem; color:var(--muted); margin:0 0 6px}
+.who{font-family:var(--serif); font-size:1.9rem; line-height:1.15; font-weight:500; margin:0 0 20px}
+.req{
+  font-family:var(--serif); font-size:1.3rem; line-height:1.55; margin:0;
+  flex:1; overflow-y:auto; overscroll-behavior:contain; padding-right:4px;
+}
+.month{display:block; font-family:var(--sans); font-size:.85rem; color:var(--muted); font-weight:400; margin-top:2px}
+.card.answered .cat{color:var(--sage)}
+.card.answered::before{background:radial-gradient(circle, var(--sageglow), transparent 70%)}
+.quiet{color:var(--muted); font-style:italic}
+.verse{font-family:var(--serif); font-style:italic; font-size:1.05rem; color:var(--muted); margin:16px 0 0; padding-top:14px; border-top:1px solid var(--line)}
+.update{font-size:.95rem; line-height:1.5; margin:14px 0 0; padding:12px 14px; border-radius:14px; background:var(--sky)}
+.update b{display:block; font-size:.8rem; color:var(--muted); font-weight:600; margin-bottom:2px}
+.hint{font-size:.85rem; color:var(--muted); margin:18px 0 0; text-align:center}
+
+.controls{display:flex; gap:12px; padding-top:18px}
+button{
+  font:inherit; font-weight:600; border:0; cursor:pointer; border-radius:999px;
+  padding:16px 20px; font-size:1.05rem; -webkit-tap-highlight-color:transparent;
+}
+button:focus-visible{outline:3px solid var(--gold); outline-offset:3px}
+.back{background:transparent; color:var(--muted); border:1.5px solid var(--line); flex:0 0 auto}
+.back:disabled{opacity:.35; cursor:default}
+.next{background:var(--ink); color:var(--sky); flex:1}
+
+.state{flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px}
+.state h2{font-family:var(--serif); font-weight:500; font-size:2rem; line-height:1.2; margin:0 0 12px}
+.state p{color:var(--muted); line-height:1.5; margin:0 0 24px; max-width:32ch}
+.flame{font-size:2.6rem; margin-bottom:14px}
+.note{font-size:.85rem; color:var(--muted); background:var(--card); border:1px solid var(--line); border-radius:14px; padding:10px 14px; margin:0 2px 14px; line-height:1.4}
+[hidden]{display:none !important}
+
+@media (prefers-reduced-motion: reduce){
+  .card,.bar span{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 class="title">Sunday Prayer<span class="month" id="month"></span></h1>
+    <span class="count" id="count"></span>
+  </header>
+  <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+
+  <main class="stack" id="stack" aria-live="polite"></main>
+
+  <div class="state" id="loading"><p>Gathering this week's requests…</p></div>
+
+  <div class="state" id="done" hidden>
+    <div class="flame" aria-hidden="true">🕯️</div>
+    <h2>You prayed for every one.</h2>
+    <p>Thank you for carrying these to God this morning. It matters more than you know.</p>
+    <button class="next" id="restart">Pray through again</button>
+  </div>
+
+  <div class="state" id="empty" hidden>
+    <h2>No requests yet.</h2>
+    <p>Staff haven't added anything for this week. Check back closer to service, or pray for the people walking in today.</p>
+    <button class="next" id="reload">Check again</button>
+  </div>
+
+  <div class="state" id="error" hidden>
+    <h2>The list didn't load.</h2>
+    <p id="errorMsg">Check your connection and try again.</p>
+    <button class="next" id="retry">Try again</button>
+  </div>
+
+  <div class="controls" id="controls" hidden>
+    <button class="back" id="prev" aria-label="Previous request">Back</button>
+    <button class="next" id="nextBtn">Amen, next</button>
+  </div>
+</div>
+
+<script>
+let items = [], i = 0, wakeLock = null, monthLabel = "";
+const $ = id => document.getElementById(id);
+
+function parseCSV(text){
+  const rows=[]; let row=[], field="", q=false;
+  for(let c=0;c<text.length;c++){
+    const ch=text[c];
+    if(q){
+      if(ch==='"'){ if(text[c+1]==='"'){field+='"';c++;} else q=false; }
+      else field+=ch;
+    } else if(ch==='"') q=true;
+    else if(ch===','){ row.push(field); field=""; }
+    else if(ch==='\n'||ch==='\r'){
+      if(ch==='\r'&&text[c+1]==='\n') c++;
+      row.push(field); rows.push(row); row=[]; field="";
+    } else field+=ch;
+  }
+  if(field||row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function toItems(rows){
+  const norm = r => r.map(c=>(c||"").trim());
+  rows = rows.map(norm);
+  // Month title, e.g. "October 2026"
+  for(const r of rows.slice(0,6)){
+    const m = r.find(c=>/^[A-Za-z]+ \d{4}$/.test(c));
+    if(m){ monthLabel = m; break; }
+  }
+  // Header row is the one naming the request column
+  const hIdx = rows.findIndex(r=>r.some(c=>/request/i.test(c)) && r.some(c=>/name|focus/i.test(c)));
+  if(hIdx<0) return [];
+  const head = rows[hIdx].map(h=>h.toLowerCase());
+  const col = test => head.findIndex(test);
+  const cI = col(h=>h.includes("category")||h.includes("section"));
+  const wI = col(h=>h.includes("name")||h.includes("focus"));
+  const rI = col(h=>h.includes("request"));
+  const sI = col(h=>h.includes("scripture")||h.includes("verse"));
+  const stI = col(h=>h.includes("status"));
+  const uI = col(h=>h.includes("update")||h.includes("praise"));
+  const get = (r,k) => k>=0 ? (r[k]||"") : "";
+  return rows.slice(hIdx+1).map(r=>({
+    category:get(r,cI), who:get(r,wI), request:get(r,rI),
+    scripture:get(r,sI), status:get(r,stI).toLowerCase(), update:get(r,uI)
+  })).filter(x=>x.who||x.request);
+}
+
+function show(which){
+  ["loading","done","empty","error"].forEach(s=>$(s).hidden = s!==which);
+  const praying = which===null;
+  $("stack").hidden = !praying;
+  $("controls").hidden = !praying;
+}
+
+function cardEl(item, extra){
+  const answered = item.status==="answered";
+  const el=document.createElement("article");
+  el.className="card"+(answered?" answered":"")+(extra?" "+extra:"");
+  const add=(tag,cls,text)=>{ const n=document.createElement(tag); if(cls) n.className=cls; n.textContent=text; el.appendChild(n); return n; };
+  const chip = answered ? "Answered prayer" : item.category;
+  if(chip) add("span","cat",chip);
+  if(item.who){
+    add("p","for", answered ? "Give thanks for" : "Pray for");
+    add("h2","who",item.who);
+  }
+  if(item.request) add("p","req",item.request);
+  else add("p","req quiet", answered ? "Thank God for how He showed up." : "No specific request this week. Lift them up by name.");
+  if(item.update){
+    const u=document.createElement("p"); u.className="update";
+    const b=document.createElement("b"); b.textContent = answered ? "Praise report" : "Latest update";
+    u.appendChild(b); u.appendChild(document.createTextNode(item.update)); el.appendChild(u);
+  }
+  if(item.scripture) add("p","verse",item.scripture);
+  if(i===0 && extra!=="under") add("p","hint","Take your time. Swipe when you're ready.");
+  return el;
+}
+
+function render(){
+  if(i>=items.length){ show("done"); $("bar").style.width="100%"; $("count").textContent=""; return; }
+  show(null);
+  const stack=$("stack"); stack.innerHTML="";
+  if(items[i+1]) stack.appendChild(cardEl(items[i+1],"under"));
+  const top=cardEl(items[i]);
+  stack.appendChild(top);
+  attachSwipe(top);
+  $("count").textContent=`${i+1} of ${items.length}`;
+  $("bar").style.width=`${(i/items.length)*100}%`;
+  $("prev").disabled = i===0;
+}
+
+function advance(dir=1){
+  const top=$("stack").lastElementChild;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(top && !reduce){
+    top.style.transform=`translateX(${dir*120}%) rotate(${dir*12}deg)`;
+    top.style.opacity="0";
+    setTimeout(()=>{ i++; render(); },260);
+  } else { i++; render(); }
+  if(navigator.vibrate) navigator.vibrate(8);
+}
+
+function attachSwipe(el){
+  let x0=null, y0=0, dx=0, t0=0, locked=null;
+  el.addEventListener("pointerdown",e=>{
+    x0=e.clientX; y0=e.clientY; dx=0; t0=Date.now(); locked=null;
+    el.classList.add("dragging");
+  });
+  el.addEventListener("pointermove",e=>{
+    if(x0===null) return;
+    const mx=e.clientX-x0, my=e.clientY-y0;
+    if(locked===null && (Math.abs(mx)>8||Math.abs(my)>8)){
+      locked = Math.abs(mx)>Math.abs(my) ? "x" : "y";
+      if(locked==="x") el.setPointerCapture(e.pointerId);
+    }
+    if(locked!=="x") return;
+    dx=mx;
+    el.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`;
+  });
+  const end=()=>{
+    if(x0===null) return;
+    el.classList.remove("dragging");
+    const fast = Math.abs(dx)/Math.max(Date.now()-t0,1) > .5;
+    if(locked==="x" && (Math.abs(dx)>90 || (fast && Math.abs(dx)>30))) advance(dx>0?1:-1);
+    else el.style.transform="";
+    x0=null;
+  };
+  el.addEventListener("pointerup",end);
+  el.addEventListener("pointercancel",end);
+}
+
+async function keepAwake(){
+  try{ if("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen"); }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") keepAwake(); });
+
+let currentTab = "";
+function sheetBase(){
+  let u = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=0`;
+  if(currentTab) u += "&sheet="+encodeURIComponent(currentTab);
+  return u;
+}
+function thisMonthTab(){
+  return new Date().toLocaleString("en-US",{month:"long", year:"numeric"}); // e.g. "October 2026"
+}
+async function getRows(){
+  try{ return await viaFetch(); }
+  catch(e){ try{ return await viaScript(); } catch(e2){ return null; } }
+}
+
+// Route 1: plain CSV fetch
+async function viaFetch(){
+  const res = await fetch(sheetBase()+"&tqx=out:csv&t="+Date.now(), {cache:"no-store"});
+  if(!res.ok) throw new Error("status "+res.status);
+  return parseCSV(await res.text());
+}
+
+// Route 2: script tag (JSONP), which sidesteps browser cross-site blocking
+function viaScript(){
+  return new Promise((resolve,reject)=>{
+    const cb = "__prayer"+Date.now();
+    const tag = document.createElement("script");
+    const done = () => { delete window[cb]; tag.remove(); };
+    const timer = setTimeout(()=>{ done(); reject(new Error("timeout")); }, 12000);
+    window[cb] = data => {
+      clearTimeout(timer); done();
+      if(!data || data.status==="error" || !data.table) return reject(new Error("sheet error"));
+      resolve(data.table.rows.map(r => (r.c||[]).map(c => c ? String(c.f ?? c.v ?? "") : "")));
+    };
+    tag.onerror = () => { clearTimeout(timer); done(); reject(new Error("script blocked")); };
+    tag.src = sheetBase()+"&tqx=out:json;responseHandler:"+cb+"&t="+Date.now();
+    document.head.appendChild(tag);
+  });
+}
+
+async function load(){
+  show("loading");
+  let rows = null;
+  if(TAB_NAME){
+    currentTab = TAB_NAME; rows = await getRows();
+  } else {
+    // Try this month's tab first. Google quietly returns the first tab when a
+    // name isn't found, so confirm the month title in the sheet matches.
+    const want = thisMonthTab();
+    currentTab = want; rows = await getRows();
+    if(rows){
+      monthLabel = ""; toItems(rows);
+      if(monthLabel && monthLabel.toLowerCase() !== want.toLowerCase()){
+        currentTab = ""; rows = await getRows() || rows;
+      }
+    } else {
+      currentTab = ""; rows = await getRows();
+    }
+  }
+
+  if(!rows){
+    const inClaude = /claude\.ai|claudeusercontent|anthropic/.test(location.hostname) || location.protocol==="blob:";
+    const msg = $("errorMsg");
+    msg.textContent = inClaude
+      ? "Previews inside Claude can't reach Google Sheets. Host this file (Netlify Drop, GitHub Pages, or your church site) and open that link instead."
+      : "The prayer list couldn't be reached. Check your connection, and make sure the sheet is shared as \"Anyone with the link can view.\" ";
+    const a = document.createElement("a");
+    a.href = SHEET_URL; a.target="_blank"; a.rel="noopener";
+    a.textContent = "Open the sheet this app reads";
+    a.style.color = "var(--gold)";
+    msg.appendChild(document.createElement("br")); msg.appendChild(document.createElement("br")); msg.appendChild(a);
+    show("error");
+    return;
+  }
+  monthLabel = "";
+  items = toItems(rows);
+  $("month").textContent = monthLabel;
+  i=0;
+  items.length ? render() : show("empty");
+}
+
+$("nextBtn").onclick=()=>advance(1);
+$("prev").onclick=()=>{ if(i>0){ i--; render(); } };
+$("restart").onclick=()=>{ i=0; render(); };
+$("reload").onclick=load;
+$("retry").onclick=load;
+document.addEventListener("keydown",e=>{
+  if($("controls").hidden) return;
+  if(e.key==="ArrowRight") advance(1);
+  if(e.key==="ArrowLeft" && i>0){ i--; render(); }
+});
+
+keepAwake();
+load();
+</script>
+</body>
+</html>
